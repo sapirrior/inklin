@@ -4,6 +4,8 @@ Expressive terminal text styling for modern command-line interfaces.
 
 Inklin is a high-performance, zero-dependency utility designed for elegant terminal string styling. It provides a familiar, chainable API with advanced features such as smart style restoration, truecolor support, and modern CLI hyperlinks, all within a lightweight footprint.
 
+![Inklin Preview](./assets/preview.svg)
+
 ## Key Features
 
 *   **Zero Dependencies**: A self-contained utility with no external supply-chain risks.
