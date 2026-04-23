@@ -1,0 +1,31 @@
+{
+  "name": "inklin",
+  "version": "1.0.0",
+  "description": "Expressive terminal text styling for modern command-line interfaces.",
+  "main": "./src/inklin.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/inklin.js",
+      "require": "./dist/inklin.cjs"
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test1": "node tests/test1.js",
+    "test2": "node tests/test2.js",
+    "test3": "node tests/test3.js",
+    "test": "npm run test1 && npm run test2 && npm run test3"
+  },
+  "keywords": [
+    "terminal",
+    "color",
+    "ansi",
+    "console",
+    "cli",
+    "chalk-alternative",
+    "lightweight"
+  ],
+  "author": "sapirrior",
+  "license": "MIT"
+}
