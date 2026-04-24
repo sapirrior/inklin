@@ -1,8 +1,32 @@
+const hexCache = new Map();
+
 export function hexToRgb(hex) {
-  let h = hex.replace('#', '');
+  if (typeof hex !== 'string') return [255, 255, 255];
+  
+  const cleanHex = hex.replace('#', '').toLowerCase();
+  if (hexCache.has(cleanHex)) return hexCache.get(cleanHex);
+
+  let h = cleanHex;
+  // Validation: Check if it's a valid hex string
+  if (!/^[0-9a-f]{3,6}$/.test(h)) return [255, 255, 255];
+
   if (h.length === 3) {
     h = h.split('').map(s => s + s).join('');
   }
+
   const n = parseInt(h, 16);
-  return [(n >> 16) & 0xFF, (n >> 8) & 0xFF, n & 0xFF];
+  const rgb = [(n >> 16) & 0xFF, (n >> 8) & 0xFF, n & 0xFF];
+  
+  // Cache the result
+  if (hexCache.size < 100) { // Limit cache size to prevent memory leaks
+    hexCache.set(cleanHex, rgb);
+  }
+  
+  return rgb;
+}
+
+export function validateRgb(val) {
+  const n = Number(val);
+  if (isNaN(n)) return 0;
+  return Math.max(0, Math.min(255, Math.round(n)));
 }

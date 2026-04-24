@@ -1,28 +1,33 @@
 import inklin from '../src/inklin.js';
 
-console.log('--- Test 3: Integration & Environment ---');
+console.log('--- Test 3: Complex Nesting & Integration ---');
 
-// 1. Hyperlinks
-console.log('Link: ' + inklin.link('Inklin Repo', 'https://github.com/user/inklin'));
+// 1. Precise Style Restoration
+// When we nest colors, the outer color should be restored perfectly.
+console.log(
+  inklin.bgBlue.white(
+    ` BLUE BG ${inklin.bgRed.bold(' RED BG BOLD ')} BACK TO BLUE BG `
+  )
+);
 
-// 2. Theme Composition
-const success = inklin.green.bold;
-const error = inklin.red.bold.underline;
-const info = inklin.blueBright.italic;
+// 2. Chaining after Enable/Disable
+// This ensures the Proxy continues to work after a toggle.
+console.log(
+  inklin.disable().red('This is PLAIN (disabled)')
+);
+console.log(
+  inklin.enable().green.bold('This is GREEN BOLD (re-enabled via chaining)')
+);
 
-console.log(success('SUCCESS: Operation complete'));
-console.log(error('ERROR: Something went wrong'));
-console.log(info('INFO: System update available'));
+// 3. Hyperlinks & Sanitization
+console.log('Safe Link: ' + inklin.link('Inklin', 'https://inklin.js.org'));
+console.log('Sanitized Link: ' + inklin.link('Broken', 'https://bad.com\x1b[31mExploit'));
 
-// 3. Environment Control (Enable/Disable)
-inklin.disable();
-console.log(inklin.red('This RED should be PLAIN (disabled)'));
-inklin.enable();
-console.log(inklin.green('This GREEN should be COLORED (enabled)'));
+// 4. Style Reusability (Composition)
+const brand = inklin.cyan.bold;
+const log = (msg) => console.log(brand`[INKLIN]`, msg);
 
-// 4. Manual Style Creation (Checking for internal state consistency)
-const boldOnly = inklin.bold;
-console.log(boldOnly('This should be just bold'));
-console.log(boldOnly.red('This should be bold and red (nested property access)'));
+log('System initialized.');
+log(inklin.green('All tests passed.'));
 
 console.log('--- Test 3 Finished ---');

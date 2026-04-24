@@ -1,7 +1,23 @@
 const isTerminal = typeof process !== 'undefined' && process.stdout && process.stdout.isTTY;
 
+const getEnabled = () => {
+  if (typeof process === 'undefined') {
+    return typeof navigator !== 'undefined' && navigator.userAgent;
+  }
+  
+  const { FORCE_COLOR, TERM } = process.env;
+  
+  // Explicitly disabled
+  if (FORCE_COLOR === '0') return false;
+  
+  // Explicitly enabled or TTY detection
+  return !!(
+    FORCE_COLOR || 
+    isTerminal || 
+    (TERM && TERM !== 'dumb' && TERM.includes('256'))
+  );
+};
+
 export const env = {
-  enabled: isTerminal || 
-    (typeof process !== 'undefined' && (process.env.FORCE_COLOR || (process.env.TERM && process.env.TERM.includes('256')))) || 
-    (typeof navigator !== 'undefined' && navigator.userAgent)
+  enabled: getEnabled()
 };

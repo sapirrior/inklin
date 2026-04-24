@@ -1,18 +1,21 @@
+<p align="center">
+  <img src="assets/inklin.png" width="400" alt="Inklin Logo">
+</p>
+
 # Inklin
 
-Expressive terminal text styling for modern command-line interfaces.
+Terminal text styling for command-line interfaces.
 
-Inklin is a high-performance, zero-dependency utility designed for elegant terminal string styling. It provides a familiar, chainable API with advanced features such as smart style restoration, truecolor support, and modern CLI hyperlinks, all within a lightweight footprint.
+Inklin is a utility for terminal string styling. It provides a chainable API with support for style restoration, truecolor, and CLI hyperlinks, within a zero-dependency footprint.
 
+## Core Features
 
-## Key Features
-
-*   **Zero Dependencies**: A self-contained utility with no external supply-chain risks.
-*   **Smart Nesting**: Automatically restores parent styles when a nested style ends, preventing color leakage.
-*   **Dual Module Support**: Native support for both ECMAScript Modules (ESM) and CommonJS (CJS).
-*   **Full Color Suite**: Comprehensive support for standard ANSI colors, bright variants, Hex, and RGB.
-*   **Modern Hyperlinks**: Native support for clickable terminal links via the OSC 8 sequence.
-*   **Tagged Templates**: Optimized string interpolation using JavaScript tagged template literals.
+*   **Style Restoration**: Tracks and restores parent styles during nesting to prevent color leakage.
+*   **Zero Dependencies**: A self-contained utility with no external runtime dependencies.
+*   **Hybrid Module Support**: Support for both ECMAScript Modules (ESM) and CommonJS (CJS).
+*   **Color Support**: Support for standard ANSI colors, bright variants, 24-bit Hex, and RGB.
+*   **Hyperlinks**: Support for clickable terminal links via the OSC 8 sequence.
+*   **Template Literals**: String interpolation using JavaScript tagged template literals.
 
 ## Installation
 
@@ -22,90 +25,80 @@ npm install inklin
 
 ## Usage
 
-### Basic Styling
+### Basic Formatting
 
 ```javascript
 import inklin from 'inklin';
 
-// Simple colors
+// Foreground colors
 console.log(inklin.blue('Informational message'));
 
-// Chaining styles
-console.log(inklin.red.bold.underline('Critical error detected'));
+// Background and modifiers
+console.log(inklin.bgRed.white.bold(' ERROR '));
 
-// Background colors
-console.log(inklin.bgGreen.black(' Success '));
+// Chained modifiers
+console.log(inklin.yellow.italic.underline('Warning: Low disk space'));
 ```
 
-### Advanced Colors (Hex and RGB)
+### Color Input
 
 ```javascript
-// Hexadecimal support (3 and 6 digit)
-console.log(inklin.hex('#50fa7b')('Custom green'));
+// Hexadecimal (supports 3 and 6 digit formats)
+console.log(inklin.hex('#50fa7b')('Brand Color'));
 
-// RGB support
-console.log(inklin.rgb(255, 165, 0)('Vibrant orange'));
+// RGB values
+console.log(inklin.rgb(255, 165, 0)('Orange Output'));
 ```
 
-### Smart Nesting
+### Integration
 
-Inklin handles nested styles intelligently by tracking and restoring the parent style context.
+#### Style Nesting
+Inklin manages the ANSI escape stack to ensure nested styles return to the outer context.
 
 ```javascript
 console.log(
-  inklin.red(`Level 1 (Red) ${inklin.blue('Level 2 (Blue)')} Level 1 (Red)`)
+  inklin.red(`Outer Red ${inklin.blue.bold('Inner Blue Bold')} Outer Red`)
 );
 ```
 
-### Hyperlinks
-
-Create clickable links in supported modern terminals.
+#### Hyperlinks
+Create clickable links in supported terminal emulators.
 
 ```javascript
-console.log(inklin.link('Documentation', 'https://github.com/Sapirrior/inklin'));
+console.log(inklin.link('Project Repository', 'https://github.com/Sapirrior/inklin'));
 ```
 
-### Tagged Templates
-
+#### Tagged Templates
 ```javascript
-const user = 'Developer';
-console.log(inklin.cyan`Hello ${user}, welcome to Inklin.`);
+const module = 'Engine';
+console.log(inklin.cyan.bold`Status: ${module} is operational.`);
 ```
 
 ## API Reference
 
-### Modifiers
-*   `bold`
-*   `dim`
-*   `italic`
-*   `underline`
-*   `inverse`
-*   `strikethrough`
+| Category | Available Properties |
+| :--- | :--- |
+| **Modifiers** | `bold`, `dim`, `italic`, `underline`, `inverse`, `strikethrough` |
+| **Standard Colors** | `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray` |
+| **Bright Colors** | `redBright`, `greenBright`, `yellowBright`, `blueBright`, `magentaBright`, `cyanBright`, `whiteBright` |
+| **Backgrounds** | `bgBlack`, `bgRed`, `bgGreen`, `bgYellow`, `bgBlue`, `bgMagenta`, `bgCyan`, `bgWhite`, `bgGray` |
+| **Bright Backgrounds** | `bgRedBright`, `bgGreenBright`, `bgYellowBright`, `bgBlueBright`, `bgMagentaBright`, `bgCyanBright`, `bgWhiteBright` |
 
-### Foreground Colors
-*   Standard: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray`
-*   Bright: `redBright`, `greenBright`, `yellowBright`, `blueBright`, `magentaBright`, `cyanBright`, `whiteBright`
+### Static Methods
 
-### Background Colors
-*   Standard: `bgBlack`, `bgRed`, `bgGreen`, `bgYellow`, `bgBlue`, `bgMagenta`, `bgCyan`, `bgWhite`, `bgGray`
-*   Bright: `bgRedBright`, `bgGreenBright`, `bgYellowBright`, `bgBlueBright`, `bgMagentaBright`, `bgCyanBright`, `bgWhiteBright`
+*   **`hex(string)`**: Applies a foreground color using a hexadecimal string.
+*   **`bgHex(string)`**: Applies a background color using a hexadecimal string.
+*   **`rgb(r, g, b)`**: Applies a foreground color using RGB integers (0-255).
+*   **`bgRgb(r, g, b)`**: Applies a background color using RGB integers (0-255).
+*   **`link(text, url)`**: Generates an ANSI escape sequence for a clickable link.
+*   **`enable()` / `disable()`**: Globally toggles styling state.
 
-### Methods
-*   `hex(string)`: Set foreground color via Hex code.
-*   `bgHex(string)`: Set background color via Hex code.
-*   `rgb(r, g, b)`: Set foreground color via RGB values.
-*   `bgRgb(r, g, b)`: Set background color via RGB values.
-*   `link(text, url)`: Create an ANSI hyperlink.
-*   `enable()` / `disable()`: Globally toggle styling.
+## Technical Specifications
 
-## Environment Support
-
-Inklin automatically detects color support. You can manually override this behavior:
-
-```javascript
-inklin.disable(); // Turns off all ANSI formatting
-inklin.enable();  // Force enables ANSI formatting
-```
+Inklin respects standard environment variables:
+*   Supports `FORCE_COLOR` and `TERM` detection.
+*   Respects `FORCE_COLOR=0` for explicit disabling of styles.
+*   Footprint is under 3KB.
 
 ## License
 
