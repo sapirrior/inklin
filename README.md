@@ -8,6 +8,10 @@ Terminal text styling for command-line interfaces.
 
 Inklin is a utility for terminal string styling. It provides a chainable API with support for style restoration, truecolor, and CLI hyperlinks, within a zero-dependency footprint.
 
+<p align="center">
+  <img src="assets/hero.png" alt="Inklin Hero" style="border-radius: 10px;">
+</p>
+
 ## Core Features
 
 *   **Style Restoration**: Tracks and restores parent styles during nesting to prevent color leakage.

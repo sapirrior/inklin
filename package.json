@@ -1,6 +1,6 @@
 {
   "name": "inklin",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Expressive terminal text styling for modern command-line interfaces.",
   "main": "./src/inklin.js",
   "type": "module",
