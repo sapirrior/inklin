@@ -11,10 +11,6 @@
     <img src="https://img.shields.io/npm/dt/inklin?style=flat-square&color=e056fd&labelColor=333" alt="downloads" height="20">
   </a>
   &nbsp;
-  <a href="https://bundlephobia.com/package/inklin">
-    <img src="https://img.shields.io/bundlephobia/min/inklin?style=flat-square&color=2ecc71&labelColor=333" alt="bundle size" height="20">
-  </a>
-  &nbsp;
   <a href="https://github.com/sapirrior/inklin/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/sapirrior/inklin?style=flat-square&color=f1c40f&labelColor=333" alt="license" height="20">
   </a>
