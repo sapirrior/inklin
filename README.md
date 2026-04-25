@@ -119,7 +119,7 @@ console.log(inklin.cyan.bold`Status: ${module} is operational.`);
 Inklin respects standard environment variables:
 *   Supports `FORCE_COLOR` and `TERM` detection.
 *   Respects `NO_COLOR` and `FORCE_COLOR=0` for explicit disabling of styles.
-*   Footprint is approximately 6KB.
+*   Footprint is only few KBs.
 
 ## License
 
