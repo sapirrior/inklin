@@ -7,8 +7,8 @@ export function hexToRgb(hex) {
   if (hexCache.has(cleanHex)) return hexCache.get(cleanHex);
 
   let h = cleanHex;
-  // Validation: Check if it's a valid hex string
-  if (!/^[0-9a-f]{3,6}$/.test(h)) return [255, 255, 255];
+  // Validation: Strictly check for valid 3 or 6 digit hex
+  if (!/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(h)) return [255, 255, 255];
 
   if (h.length === 3) {
     h = h.split('').map(s => s + s).join('');

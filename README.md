@@ -21,7 +21,7 @@
 
 Terminal text styling for command-line interfaces.
 
-Inklin is a utility for terminal string styling. It provides a chainable API with support for style restoration, truecolor, and CLI hyperlinks, within a zero-dependency footprint.
+Inklin is a utility for terminal string styling. It provides a chainable API with support for state-aware style restoration, truecolor, and CLI hyperlinks, within a zero-dependency footprint.
 
 <p align="center">
   <img src="assets/hero.png" alt="Inklin Hero" style="border-radius: 30px;">
@@ -29,7 +29,7 @@ Inklin is a utility for terminal string styling. It provides a chainable API wit
 
 ## Core Features
 
-*   **Style Restoration**: Tracks and restores parent styles during nesting to prevent color leakage.
+*   **Style Restoration**: State-aware mechanism that tracks and restores parent styles during nesting, including handling of global resets.
 *   **Zero Dependencies**: A self-contained utility with no external runtime dependencies.
 *   **Hybrid Module Support**: Support for both ECMAScript Modules (ESM) and CommonJS (CJS).
 *   **Color Support**: Support for standard ANSI colors, bright variants, 24-bit Hex, and RGB.
@@ -44,28 +44,30 @@ npm install inklin
 
 ## Usage
 
-### Basic Formatting
-
+### ECMAScript Modules (ESM)
 ```javascript
 import inklin from 'inklin';
 
-// Foreground colors
 console.log(inklin.blue('Informational message'));
+```
 
+### CommonJS (CJS)
+```javascript
+const inklin = require('inklin');
+
+console.log(inklin.red.bold('Error message'));
+```
+
+### Advanced Formatting
+```javascript
 // Background and modifiers
 console.log(inklin.bgRed.white.bold(' ERROR '));
 
 // Chained modifiers
 console.log(inklin.yellow.italic.underline('Warning: Low disk space'));
-```
 
-### Color Input
-
-```javascript
-// Hexadecimal (supports 3 and 6 digit formats)
+// Hexadecimal and RGB
 console.log(inklin.hex('#50fa7b')('Brand Color'));
-
-// RGB values
 console.log(inklin.rgb(255, 165, 0)('Orange Output'));
 ```
 
@@ -116,8 +118,8 @@ console.log(inklin.cyan.bold`Status: ${module} is operational.`);
 
 Inklin respects standard environment variables:
 *   Supports `FORCE_COLOR` and `TERM` detection.
-*   Respects `FORCE_COLOR=0` for explicit disabling of styles.
-*   Footprint is under few KBs.
+*   Respects `NO_COLOR` and `FORCE_COLOR=0` for explicit disabling of styles.
+*   Footprint is approximately 6KB.
 
 ## License
 

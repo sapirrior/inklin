@@ -4,37 +4,40 @@ This document describes the technical architecture and component responsibilitie
 
 ## Core Architecture
 
-Inklin uses a **Recursive Proxy** pattern to enable infinite style chaining without pre-generating every possible combination.
+Inklin utilizes a **Recursive Proxy** pattern to facilitate style chaining without the requirement for pre-generated style combinations.
 
 ### 1. Entry Point (`src/inklin.js`)
-The primary gateway for the library. It initializes the first instance of the styler and exports it as the default.
+The primary module for the library. It initializes the base styler instance and provides the default export.
 
 ### 2. Styling Engine (`src/engine/`)
 
 #### `core.js`
-The heart of the library.
+The central logic of the library.
 - **`createStyler(open, close)`**: A factory function that returns a `Proxy` wrapped around a styling function.
-- **Proxy Logic**: Intercepts property access (e.g., `.red`, `.bold`). If the property matches an ANSI code, it returns a new styler with updated escape sequences.
-- **Smart Nesting**: Inside the styler, the code detects if a string already contains ANSI reset codes and re-injects the parent styles immediately after them to prevent "style leakage."
+- **Proxy Logic**: Intercepts property access. When a property matches an ANSI code definition, it returns a new styler instance with merged escape sequences.
+- **State-Aware Style Restoration**: Implements a restoration mechanism that utilizes a single-pass regular expression to re-apply styles following nested resets (`\x1b[0m`) or specific termination codes. This ensures that styles are accurately restored for subsequent text while maintaining explicit reset zones.
+- **Output Optimization**: Pre-calculates restoration patterns during the instantiation phase and deduplicates consecutive identical ANSI sequences to reduce the overall character count of the terminal output.
 
 #### `environment.js`
-Manages global state and terminal detection.
-- **Color Detection**: Uses `process.stdout.isTTY`, `FORCE_COLOR`, and `TERM` environment variables to decide if colors should be rendered.
-- **Live State**: Exports a mutable `env` object so that calling `.disable()` or `.enable()` updates all active styler instances simultaneously.
+Manages configuration and terminal capability detection.
+- **Color Detection**: Evaluates `process.stdout.isTTY`, `FORCE_COLOR`, `TERM`, and `NO_COLOR` environment variables to determine rendering state.
+- **Global State**: Exports a shared `env` object, allowing `.disable()` or `.enable()` calls to affect all active styler instances.
 
 ### 3. Data & Constants (`src/constants/`)
 
 #### `ansi.js`
-A dictionary mapping style names (foreground, background, modifiers, and brights) to their standard ANSI escape code pairs (opening and closing codes).
+A mapping of style identifiers to their respective standard ANSI escape code pairs.
 
 ### 4. Utilities (`src/utils/`)
 
 #### `color.js`
-Contains `hexToRgb`, which parses 3-digit and 6-digit hex strings into their integer RGB components for Truecolor (24-bit) output.
+Handles color value processing:
+- **`hexToRgb`**: Parses and validates 3-digit and 6-digit hexadecimal strings.
+- **Cache Management**: Employs a fixed-size `Map` cache (maximum 100 entries) for hexadecimal-to-RGB conversions to minimize recalculation overhead.
 
 ### 5. Build System (`scripts/`)
 
 #### `build.js`
-A zero-dependency bundler used to create the CommonJS distribution (`dist/inklin.cjs`).
-- **Logic**: Reads the modular ESM source files, strips `import`/`export` keywords using regular expressions, and inlines them into a single file wrapped in an IIFE.
-- **Purpose**: Ensures compatibility for environments that do not yet support ESM without requiring a heavy external build tool.
+A specialized bundling script for the CommonJS distribution (`dist/inklin.cjs`).
+- **Transformation Logic**: Uses word-boundary-sensitive operations (`\bexport\b`) to remove ECMAScript Module syntax and encapsulate the source within a CommonJS-compatible IIFE.
+- **Integrity**: Implemented to prevent accidental modification of literal strings or comments during the code transformation process.

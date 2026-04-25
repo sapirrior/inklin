@@ -3,32 +3,55 @@ import { hexToRgb, validateRgb } from '../utils/color.js';
 import { env } from './environment.js';
 
 export function createStyler(openCodes = [], closeCodes = []) {
-  // Use a unique set of opening codes for this styler instance
   const openAnsi = openCodes.length > 0 ? `\x1b[${openCodes.join(';')}m` : '';
+  const closeAnsi = closeCodes.map(c => `\x1b[${c}m`).reverse().join('');
+  
+  // Pre-calculate restoration patterns for efficiency
+  const restorationPatterns = openAnsi 
+    ? [...new Set([...closeCodes, 0])].map(c => `\x1b[${c}m`)
+    : [];
 
   const styler = (strings, ...values) => {
     let str = strings;
     if (Array.isArray(strings)) {
-      str = strings.reduce((acc, part, i) => acc + part + (values[i] === undefined ? '' : values[i]), '');
+      str = strings.reduce((acc, part, i) => {
+        const val = values[i];
+        return acc + part + (val == null ? '' : val);
+      }, '');
     }
 
     if (!env.enabled) return str;
     if (str === undefined || str === null) return '';
+    
     let result = (typeof str === 'string') ? str : String(str);
-    if (result === '' || openCodes.length === 0) return result;
+    if (result === '' || openAnsi === '') return result;
     
     // Efficiently handle nested styles:
-    // If the inner string contains a reset code that matches one of our closing codes,
-    // we need to re-open our specific styles immediately after.
-    const uniqueCloses = [...new Set(closeCodes)];
-    for (const close of uniqueCloses) {
-      const closeAnsi = `\x1b[${close}m`;
-      if (result.indexOf(closeAnsi) !== -1) {
-        result = result.split(closeAnsi).join(closeAnsi + openAnsi);
-      }
+    if (restorationPatterns.length > 0) {
+      // Create a combined regex for all patterns
+      const combinedPattern = restorationPatterns
+        .map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('|');
+      const regex = new RegExp(combinedPattern, 'g');
+
+      let resetCount = 0;
+      result = result.replace(regex, (match) => {
+        if (match === '\x1b[0m') {
+          resetCount++;
+          // If this is the FIRST reset in a sequence, it's an 'opener' of a reset zone.
+          // If it's the SECOND, it's a 'closer' of a reset zone.
+          // We only re-open our style after a 'closer'.
+          return (resetCount % 2 === 0) ? match + openAnsi : match;
+        }
+        // For other closing codes (like \x1b[39m), they are always closers.
+        return match + openAnsi;
+      });
     }
 
-    const closeAnsi = closeCodes.map(c => `\x1b[${c}m`).reverse().join('');
+    // Final cleanup: Remove redundant/consecutive identical ANSI sequences 
+    // and empty styled blocks to keep the output minimal.
+    result = result.replace(/(\x1b\[[0-9;]*m)\1+/g, '$1');
+    
     return openAnsi + result + closeAnsi;
   };
 

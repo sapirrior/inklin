@@ -5,10 +5,10 @@ const getEnabled = () => {
     return typeof navigator !== 'undefined' && navigator.userAgent;
   }
   
-  const { FORCE_COLOR, TERM } = process.env;
+  const { FORCE_COLOR, TERM, NO_COLOR } = process.env;
   
   // Explicitly disabled
-  if (FORCE_COLOR === '0') return false;
+  if (NO_COLOR || FORCE_COLOR === '0') return false;
   
   // Explicitly enabled or TTY detection
   return !!(

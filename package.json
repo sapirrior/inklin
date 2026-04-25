@@ -1,6 +1,6 @@
 {
   "name": "inklin",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Expressive terminal text styling for modern command-line interfaces.",
   "main": "./src/inklin.js",
   "type": "module",
@@ -12,10 +12,9 @@
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "test1": "node tests/test1.js",
-    "test2": "node tests/test2.js",
-    "test3": "node tests/test3.js",
-    "test": "npm run test1 && npm run test2 && npm run test3"
+    "test:module": "node tests/module/test1.js && node tests/module/test2.js && node tests/module/test3.js && node tests/module/test4.js",
+    "test:cjs": "node tests/commonjs/test1.cjs && node tests/commonjs/test2.cjs && node tests/commonjs/test3.cjs",
+    "test": "npm run test:module && npm run test:cjs"
   },
   "keywords": [
     "terminal",

@@ -1,4 +1,4 @@
-import inklin from '../src/inklin.js';
+import inklin from '../../src/inklin.js';
 
 console.log('--- Test 2: Advanced Colors & Logic ---');
 

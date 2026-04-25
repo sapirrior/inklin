@@ -11,8 +11,8 @@ function build() {
 
   const readPart = (relPath) => {
     return fs.readFileSync(path.join(SRC_DIR, relPath), 'utf8')
-      .replace(/export (const|let|function)/g, '$1')
-      .replace(/import .*/g, '');
+      .replace(/\bexport (const|let|function)\b/g, '$1')
+      .replace(/^import .*;?\n?/gm, '');
   };
 
   const ansi = readPart('constants/ansi.js');

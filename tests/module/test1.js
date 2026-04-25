@@ -1,4 +1,4 @@
-import inklin from '../src/inklin.js';
+import inklin from '../../src/inklin.js';
 
 console.log('--- Test 1: Core Styling (Colors, Brights, Mods) ---');
 

@@ -1,4 +1,4 @@
-import inklin from '../src/inklin.js';
+import inklin from '../../src/inklin.js';
 
 // 1. Prompt and Gap
 const prompt = inklin.green('root@localhost') + inklin.white(':') + inklin.blue('~') + inklin.white('# ');
