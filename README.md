@@ -30,6 +30,7 @@ Inklin is a utility for terminal string styling. It provides a chainable API wit
 ## Core Features
 
 *   **Style Restoration**: State-aware mechanism that tracks and restores parent styles during nesting, including handling of global resets.
+*   **Automatic Color Downsampling**: Automatically detects terminal support and downsamples Truecolor (Hex/RGB) to ANSI 256 or 16-color palettes as needed.
 *   **Zero Dependencies**: A self-contained utility with no external runtime dependencies.
 *   **Hybrid Module Support**: Support for both ECMAScript Modules (ESM) and CommonJS (CJS).
 *   **Color Support**: Support for standard ANSI colors, bright variants, 24-bit Hex, and RGB.

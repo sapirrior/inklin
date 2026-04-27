@@ -13,7 +13,7 @@ console.log(inklin.rgb(999, -50, 100)('Out of range RGB (Auto-clamped)'));
 
 // Tagged Templates (Complex)
 const status = 'READY';
-const version = '1.0.1';
+const version = 'latest';
 console.log(inklin.cyan.bold`System ${status} - v${version}`);
 console.log(inklin.magenta`Template with ${inklin.yellow.underline('Nested Styled Value')} inside.`);
 

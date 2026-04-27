@@ -1,15 +1,24 @@
-import { ANSI_CODES } from '../constants/ansi.js';
-import { hexToRgb, validateRgb } from '../utils/color.js';
-import { env } from './environment.js';
+import { ANSI_CODES } from '../registry/ansi.js';
+import { hexToRgb, validateRgb, rgbToAnsi256, rgbToAnsi16 } from '../processors/color.js';
+import { env } from './platform.js';
 
 export function createStyler(openCodes = [], closeCodes = []) {
   const openAnsi = openCodes.length > 0 ? `\x1b[${openCodes.join(';')}m` : '';
   const closeAnsi = closeCodes.map(c => `\x1b[${c}m`).reverse().join('');
+  const cache = {};
   
-  // Pre-calculate restoration patterns for efficiency
+  // Pre-calculate and pre-compile restoration regex for efficiency
   const restorationPatterns = openAnsi 
     ? [...new Set([...closeCodes, 0])].map(c => `\x1b[${c}m`)
     : [];
+  
+  let restorationRegex = null;
+  if (restorationPatterns.length > 0) {
+    const combinedPattern = restorationPatterns
+      .map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|');
+    restorationRegex = new RegExp(combinedPattern, 'g');
+  }
 
   const styler = (strings, ...values) => {
     let str = strings;
@@ -26,16 +35,10 @@ export function createStyler(openCodes = [], closeCodes = []) {
     let result = (typeof str === 'string') ? str : String(str);
     if (result === '' || openAnsi === '') return result;
     
-    // Efficiently handle nested styles:
-    if (restorationPatterns.length > 0) {
-      // Create a combined regex for all patterns
-      const combinedPattern = restorationPatterns
-        .map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-        .join('|');
-      const regex = new RegExp(combinedPattern, 'g');
-
+    // Efficiently handle nested styles using pre-compiled regex:
+    if (restorationRegex) {
       let resetCount = 0;
-      result = result.replace(regex, (match) => {
+      result = result.replace(restorationRegex, (match) => {
         if (match === '\x1b[0m') {
           resetCount++;
           // If this is the FIRST reset in a sequence, it's an 'opener' of a reset zone.
@@ -61,45 +64,59 @@ export function createStyler(openCodes = [], closeCodes = []) {
       if (prop === 'enable') return () => { env.enabled = true; return proxy; };
       
       if (ANSI_CODES[prop]) {
-        const [o, c] = ANSI_CODES[prop];
-        return createStyler([...openCodes, o], [...closeCodes, c]);
+        if (!cache[prop]) {
+          const [o, c] = ANSI_CODES[prop];
+          cache[prop] = createStyler([...openCodes, o], [...closeCodes, c]);
+        }
+        return cache[prop];
       }
+
+      const applyColor = (r, g, b, isBg) => {
+        const rr = validateRgb(r), gg = validateRgb(g), bb = validateRgb(b);
+        let code;
+        if (env.level >= 3) {
+          code = `${isBg ? 48 : 38};2;${rr};${gg};${bb}`;
+        } else if (env.level === 2) {
+          code = `${isBg ? 48 : 38};5;${rgbToAnsi256(rr, gg, bb)}`;
+        } else if (env.level === 1) {
+          const idx = rgbToAnsi16(rr, gg, bb);
+          code = (isBg ? (idx < 8 ? 40 + idx : 100 + (idx - 8)) : (idx < 8 ? 30 + idx : 90 + (idx - 8)));
+        } else {
+          return createStyler(openCodes, closeCodes);
+        }
+        return createStyler([...openCodes, code], [...closeCodes, isBg ? 49 : 39]);
+      };
 
       if (prop === 'hex') {
         return (color) => {
           const [r, g, b] = hexToRgb(color);
-          return createStyler([...openCodes, `38;2;${r};${g};${b}`], [...closeCodes, 39]);
+          return applyColor(r, g, b, false);
         };
       }
 
       if (prop === 'rgb') {
-        return (r, g, b) => {
-          const rr = validateRgb(r), gg = validateRgb(g), bb = validateRgb(b);
-          return createStyler([...openCodes, `38;2;${rr};${gg};${bb}`], [...closeCodes, 39]);
-        };
+        return (r, g, b) => applyColor(r, g, b, false);
       }
 
       if (prop === 'bgHex') {
         return (color) => {
           const [r, g, b] = hexToRgb(color);
-          return createStyler([...openCodes, `48;2;${r};${g};${b}`], [...closeCodes, 49]);
+          return applyColor(r, g, b, true);
         };
       }
 
       if (prop === 'bgRgb') {
-        return (r, g, b) => {
-          const rr = validateRgb(r), gg = validateRgb(g), bb = validateRgb(b);
-          return createStyler([...openCodes, `48;2;${rr};${gg};${bb}`], [...closeCodes, 49]);
-        };
+        return (r, g, b) => applyColor(r, g, b, true);
       }
 
       if (prop === 'link') {
         return (text, url) => {
-          if (!env.enabled) return text;
           const safeText = (text === undefined || text === null) ? '' : text;
+          if (!env.enabled) return String(safeText);
           // Basic URL sanitization to prevent escape sequence injection
           const safeUrl = String(url).replace(/[^\x20-\x7E]/g, '');
-          return `\x1b]8;;${safeUrl}\x1b\\${safeText}\x1b]8;;\x1b\\`;
+          const link = `\x1b]8;;${safeUrl}\x1b\\${safeText}\x1b]8;;\x1b\\`;
+          return target(link);
         };
       }
       

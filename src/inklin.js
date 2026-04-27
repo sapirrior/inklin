@@ -1,4 +1,4 @@
-import { createStyler } from './engine/core.js';
+import { createStyler } from './kernel/kernel.js';
 
 const inklin = createStyler();
 

@@ -7,7 +7,7 @@ This document outlines the procedures and standards for contributing to the Inkl
 All contributions must adhere to the following project constraints:
 *   **Zero Dependencies**: No external runtime dependencies may be added.
 *   **Module Support**: All code must support both ECMAScript Modules (ESM) and CommonJS (CJS).
-*   **Modular Architecture**: Logic must remain decoupled into `src/engine/`, `src/constants/`, and `src/utils/`.
+*   **Modular Architecture**: Logic must remain decoupled into `src/kernel/`, `src/registry/`, and `src/processors/`.
 *   **Footprint**: Code should remain concise to maintain a small installation size.
 
 ## Development Setup
@@ -47,6 +47,12 @@ npm test
 3.  Ensure the build script executes successfully and all tests pass.
 4.  Update the documentation in `README.md` if the public API has changed.
 5.  Submit a pull request with a clear, objective description of the modifications.
+
+## Documentation & Communication Standards
+
+*   **Tone**: Maintain a formal, objective, and technical tone in all documentation, commit messages, and pull requests.
+*   **Prohibitions**: The use of emojis, slang, or casual language is strictly prohibited.
+*   **Clarity**: Descriptions must be concise and to-the-point. Avoid hyperbolic or subjective terms such as "best", "fastest", "high performance", or "revolutionary". Focus strictly on measurable technical facts and implementation details.
 
 ## Coding Standards
 

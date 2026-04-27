@@ -4,8 +4,6 @@ jspm_packages/
 
 # Build artifacts
 dist/
-.code/
-.github/
 assets/
 
 # Logs

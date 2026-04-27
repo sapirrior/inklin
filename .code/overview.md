@@ -2,42 +2,54 @@
 
 This document describes the technical architecture and component responsibilities of the Inklin codebase.
 
+## Version
+Current Major Version: **2.0.0**
+
 ## Core Architecture
 
 Inklin utilizes a **Recursive Proxy** pattern to facilitate style chaining without the requirement for pre-generated style combinations.
 
 ### 1. Entry Point (`src/inklin.js`)
-The primary module for the library. It initializes the base styler instance and provides the default export.
+The primary module for the library. It initializes the base styler instance using the kernel logic and provides the default export.
 
-### 2. Styling Engine (`src/engine/`)
+### 2. Kernel Logic (`src/kernel/`)
 
-#### `core.js`
+#### `kernel.js`
 The central logic of the library.
 - **`createStyler(open, close)`**: A factory function that returns a `Proxy` wrapped around a styling function.
-- **Proxy Logic**: Intercepts property access. When a property matches an ANSI code definition, it returns a new styler instance with merged escape sequences.
-- **State-Aware Style Restoration**: Implements a restoration mechanism that utilizes a single-pass regular expression to re-apply styles following nested resets (`\x1b[0m`) or specific termination codes. This ensures that styles are accurately restored for subsequent text while maintaining explicit reset zones.
-- **Output Optimization**: Pre-calculates restoration patterns during the instantiation phase and deduplicates consecutive identical ANSI sequences to reduce the overall character count of the terminal output.
+- **Performance Optimization**: Implements **Regex Hoisting** where style restoration patterns are pre-compiled during the instantiation phase.
+- **Proxy Caching**: Memoizes styler instances for static properties to reduce object allocation and initialization overhead.
+- **State-Aware Style Restoration**: Implements a restoration mechanism that utilizes a pre-compiled regular expression to re-apply styles following nested resets (`\x1b[0m`) or specific termination codes.
+- **Hybrid Link Support**: The `link` method is fully integrated into the style chain, allowing for styled clickable terminal hyperlinks.
 
-#### `environment.js`
+#### `platform.js`
 Manages configuration and terminal capability detection.
-- **Color Detection**: Evaluates `process.stdout.isTTY`, `FORCE_COLOR`, `TERM`, and `NO_COLOR` environment variables to determine rendering state.
-- **Global State**: Exports a shared `env` object, allowing `.disable()` or `.enable()` calls to affect all active styler instances.
+- **Color Level Detection**: Evaluates environment variables (`COLORTERM`, `FORCE_COLOR`, `TERM`, `NO_COLOR`) to determine the color support level:
+    - **Level 3**: 24-bit Truecolor
+    - **Level 2**: ANSI 256 colors
+    - **Level 1**: Basic 16 colors
+    - **Level 0**: Disabled
+- **Global State**: Exports a shared `env` object, allowing `.disable()` or `.enable()` calls to affect all active styler instances while preserving detected support levels.
 
-### 3. Data & Constants (`src/constants/`)
+### 3. Registry & Definitions (`src/registry/`)
 
 #### `ansi.js`
 A mapping of style identifiers to their respective standard ANSI escape code pairs.
 
-### 4. Utilities (`src/utils/`)
+### 4. Processors (`src/processors/`)
 
 #### `color.js`
-Handles color value processing:
-- **`hexToRgb`**: Parses and validates 3-digit and 6-digit hexadecimal strings.
-- **Cache Management**: Employs a fixed-size `Map` cache (maximum 100 entries) for hexadecimal-to-RGB conversions to minimize recalculation overhead.
+Handles complex color value processing and mapping:
+- **`hexToRgb`**: Parses and validates hexadecimal strings with internal memoization.
+- **Automatic Color Downsampling**: Mathematically maps RGB/Hex values to the nearest ANSI 256 or ANSI 16 color index based on the detected `platform` support level.
 
-### 5. Build System (`scripts/`)
+### 5. Type System (`types/`)
+
+#### `inklin.d.ts`
+First-class TypeScript definition file providing full interface documentation and autocompletion for the styler, methods, and environment object.
+
+### 6. Build System (`scripts/`)
 
 #### `build.js`
 A specialized bundling script for the CommonJS distribution (`dist/inklin.cjs`).
-- **Transformation Logic**: Uses word-boundary-sensitive operations (`\bexport\b`) to remove ECMAScript Module syntax and encapsulate the source within a CommonJS-compatible IIFE.
-- **Integrity**: Implemented to prevent accidental modification of literal strings or comments during the code transformation process.
+- **Transformation Logic**: Performs keyword-boundary-sensitive operations to transform ECMAScript Modules into a CommonJS-compatible IIFE bundle.

@@ -25,6 +25,28 @@ export function hexToRgb(hex) {
   return rgb;
 }
 
+export function rgbToAnsi256(r, g, b) {
+  // Grayscale ramp
+  if (r === g && g === b) {
+    if (r < 8) return 16;
+    if (r > 248) return 255;
+    return Math.round(((r - 8) / 247) * 23) + 232;
+  }
+
+  return 16 
+    + (36 * Math.round(r / 255 * 5))
+    + (6 * Math.round(g / 255 * 5))
+    + Math.round(b / 255 * 5);
+}
+
+export function rgbToAnsi16(r, g, b) {
+  const i = r + g + b > 383 ? 8 : 0; // Brightness threshold
+  const red = r > 127 ? 1 : 0;
+  const green = g > 127 ? 2 : 0;
+  const blue = b > 127 ? 4 : 0;
+  return i + red + green + blue;
+}
+
 export function validateRgb(val) {
   const n = Number(val);
   if (isNaN(n)) return 0;

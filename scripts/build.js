@@ -15,10 +15,10 @@ function build() {
       .replace(/^import .*;?\n?/gm, '');
   };
 
-  const ansi = readPart('constants/ansi.js');
-  const colorUtils = readPart('utils/color.js');
-  const env = readPart('engine/environment.js');
-  const core = readPart('engine/core.js');
+  const ansi = readPart('registry/ansi.js');
+  const colorUtils = readPart('processors/color.js');
+  const env = readPart('kernel/platform.js');
+  const core = readPart('kernel/kernel.js');
 
   const entry = `
 const { createStyler } = (function() {
