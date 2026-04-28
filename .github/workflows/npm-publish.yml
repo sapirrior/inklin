@@ -9,11 +9,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -22,10 +24,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: npm install
-      
-      - name: Build .cjs
-        run: npm run build
+        run: npm install --no-bin-links
+
+      - name: Build Distributions
+        run: |
+          npm run build
+          npm run build:cdn
 
       - name: Verify tag version matches package.json
         run: |
@@ -43,3 +47,15 @@ jobs:
         run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Commit and Push CDN Bundle
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add cdn/
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes in CDN bundle to commit."
+          else
+            git commit -m "chore: update cdn bundle for ${{ github.ref_name }} [skip ci]"
+            git push origin HEAD:main
+          fi

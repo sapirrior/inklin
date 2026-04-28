@@ -1,3 +1,5 @@
+"use strict";
+
 export const ANSI_CODES = {
   reset: [0, 0],
   bold: [1, 22],

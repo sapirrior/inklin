@@ -1,8 +1,10 @@
 {
   "name": "inklin",
-  "version": "2.0.0",
-  "description": "Expressive terminal text styling for modern command-line interfaces.",
+  "version": "3.0.0",
+  "description": "Zero-dependency terminal text styling with Truecolor support, state-aware nested restoration, and JIT-targeted execution.",
+  "sideEffects": false,
   "main": "./src/inklin.js",
+  "module": "./src/inklin.js",
   "types": "./types/inklin.d.ts",
   "type": "module",
   "exports": {
@@ -13,9 +15,11 @@
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "test:module": "node tests/esm/test1.js && node tests/esm/test2.js && node tests/esm/test3.js && node tests/esm/test4.js && node tests/esm/test5.js",
-    "test:cjs": "node tests/cjs/test1.cjs && node tests/cjs/test2.cjs && node tests/cjs/test3.cjs && node tests/cjs/test4.cjs",
-    "test": "npm run test:module && npm run test:cjs"
+    "build:cdn": "node scripts/buildCDN.js",
+    "test:module": "node tests/esm/suite.js",
+    "test:cjs": "node tests/cjs/suite.cjs",
+    "test:cdn": "node tests/cdn/suite.js",
+    "test": "npm run test:module && npm run test:cjs && npm run test:cdn"
   },
   "keywords": [
     "terminal",
@@ -23,14 +27,35 @@
     "ansi",
     "console",
     "cli",
+    "chalk",
     "chalk-alternative",
-    "lightweight"
+    "terminal-colors",
+    "truecolor",
+    "rgb",
+    "hex",
+    "styling",
+    "formatting",
+    "logging",
+    "performance",
+    "zero-dependencies",
+    "esm",
+    "cjs",
+    "typescript",
+    "nested-styling"
   ],
   "author": "sapirrior",
   "license": "MIT",
+  "engines": {
+    "node": ">=14.16.0"
+  },
+  "homepage": "https://github.com/sapirrior/inklin#readme",
+  "bugs": {
+    "url": "https://github.com/sapirrior/inklin/issues"
+  },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "types"
   ],
   "repository": {
     "type": "git",

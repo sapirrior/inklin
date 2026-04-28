@@ -8,6 +8,7 @@ All contributions must adhere to the following project constraints:
 *   **Zero Dependencies**: No external runtime dependencies may be added.
 *   **Module Support**: All code must support both ECMAScript Modules (ESM) and CommonJS (CJS).
 *   **Modular Architecture**: Logic must remain decoupled into `src/kernel/`, `src/registry/`, and `src/processors/`.
+*   **Heavy Nomenclature**: Use standardized terminology for modules: `kernel` (engine), `registry` (constants), `processors` (utilities), and `platform` (environment state).
 *   **Footprint**: Code should remain concise to maintain a small installation size.
 
 ## Development Setup

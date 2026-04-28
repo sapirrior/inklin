@@ -7,7 +7,7 @@ Current Major Version: **2.0.0**
 
 ## Core Architecture
 
-Inklin utilizes a **Recursive Proxy** pattern to facilitate style chaining without the requirement for pre-generated style combinations.
+Inklin utilizes a **JIT-Targeted Prototype Architecture** to facilitate style chaining with deterministic performance and memory stability across Node.js and Browser environments.
 
 ### 1. Entry Point (`src/inklin.js`)
 The primary module for the library. It initializes the base styler instance using the kernel logic and provides the default export.
@@ -15,21 +15,16 @@ The primary module for the library. It initializes the base styler instance usin
 ### 2. Kernel Logic (`src/kernel/`)
 
 #### `kernel.js`
-The central logic of the library.
-- **`createStyler(open, close)`**: A factory function that returns a `Proxy` wrapped around a styling function.
-- **Performance Optimization**: Implements **Regex Hoisting** where style restoration patterns are pre-compiled during the instantiation phase.
-- **Proxy Caching**: Memoizes styler instances for static properties to reduce object allocation and initialization overhead.
-- **State-Aware Style Restoration**: Implements a restoration mechanism that utilizes a pre-compiled regular expression to re-apply styles following nested resets (`\x1b[0m`) or specific termination codes.
-- **Hybrid Link Support**: The `link` method is fully integrated into the style chain, allowing for styled clickable terminal hyperlinks.
+The central engine of the library.
+- **JIT-Targeted Prototype**: Style properties replace themselves with static references upon first access, maintaining stable hidden classes (shapes) in the V8 engine.
+- **Global Regex Registry**: Manages compiled regular expressions used for style restoration through a centralized cache, ensuring a finite memory footprint.
+- **Modulo-2 Style Restoration**: Implements a state-aware mechanism that utilizes a counter to correctly re-apply parent styles only when escaping nested reset zones (`\x1b[0m`).
+- **Hybrid Link Support**: The `link` method integrates into the style chain, supporting clickable terminal hyperlinks with sanitization of control characters.
 
 #### `platform.js`
 Manages configuration and terminal capability detection.
-- **Color Level Detection**: Evaluates environment variables (`COLORTERM`, `FORCE_COLOR`, `TERM`, `NO_COLOR`) to determine the color support level:
-    - **Level 3**: 24-bit Truecolor
-    - **Level 2**: ANSI 256 colors
-    - **Level 1**: Basic 16 colors
-    - **Level 0**: Disabled
-- **Global State**: Exports a shared `env` object, allowing `.disable()` or `.enable()` calls to affect all active styler instances while preserving detected support levels.
+- **Capability Detection**: Evaluates environment variables (`COLORTERM`, `FORCE_COLOR`, `TERM`, `NO_COLOR`) or browser global objects to determine the color support level (0-3).
+- **Global State**: Exports a shared `env` object, allowing `.disable()` or `.enable()` calls to affect all active styler instances globally.
 
 ### 3. Registry & Definitions (`src/registry/`)
 
@@ -39,17 +34,18 @@ A mapping of style identifiers to their respective standard ANSI escape code pai
 ### 4. Processors (`src/processors/`)
 
 #### `color.js`
-Handles complex color value processing and mapping:
-- **`hexToRgb`**: Parses and validates hexadecimal strings with internal memoization.
-- **Automatic Color Downsampling**: Mathematically maps RGB/Hex values to the nearest ANSI 256 or ANSI 16 color index based on the detected `platform` support level.
+Handles color value processing and mapping:
+- **`hexToRgb`**: Parses and validates hexadecimal strings with an LRU-capped cache.
+- **Automatic Color Downsampling**: Mathematically maps RGB/Hex values to the nearest ANSI 256 or ANSI 16 color index based on the detected support level.
 
 ### 5. Type System (`types/`)
 
 #### `inklin.d.ts`
-First-class TypeScript definition file providing full interface documentation and autocompletion for the styler, methods, and environment object.
+TypeScript definition file providing interface documentation and autocompletion for the styler, methods, and environment object.
 
 ### 6. Build System (`scripts/`)
 
-#### `build.js`
-A specialized bundling script for the CommonJS distribution (`dist/inklin.cjs`).
-- **Transformation Logic**: Performs keyword-boundary-sensitive operations to transform ECMAScript Modules into a CommonJS-compatible IIFE bundle.
+#### `build.js` / `buildCDN.js`
+Specialized bundling scripts for the CommonJS distribution (`dist/inklin.cjs`) and minified UMD distribution (`cdn/inklin.min.js`).
+- **Transformation Logic**: Performs keyword-boundary-sensitive operations to transform ECMAScript Modules into environment-compatible bundles.
+- **Optimization**: The CDN build applies aggressive whitespace and comment removal to minimize network payload.

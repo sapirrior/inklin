@@ -16,26 +16,39 @@
   </a>
 </p>
 
-
 # Inklin
 
-Terminal text styling for command-line interfaces.
+Terminal text styling for command-line interfaces and browser consoles.
 
-Inklin is a utility for terminal string styling. It provides a chainable API with support for state-aware style restoration, truecolor, and CLI hyperlinks, within a zero-dependency footprint.
+Inklin provides a chainable API for string styling with support for state-aware style restoration, Truecolor (RGB/Hex), and CLI hyperlinks, within a zero-dependency footprint.
 
 <p align="center">
-  <img src="assets/hero.png" alt="Inklin Hero" style="border-radius: 30px;">
+  <img src="assets/hero.png" alt="Inklin Technical Display" style="border-radius: 30px;">
 </p>
 
-## Core Features
+## Quick Start
 
-*   **Style Restoration**: State-aware mechanism that tracks and restores parent styles during nesting, including handling of global resets.
-*   **Automatic Color Downsampling**: Automatically detects terminal support and downsamples Truecolor (Hex/RGB) to ANSI 256 or 16-color palettes as needed.
-*   **Zero Dependencies**: A self-contained utility with no external runtime dependencies.
-*   **Hybrid Module Support**: Support for both ECMAScript Modules (ESM) and CommonJS (CJS).
-*   **Color Support**: Support for standard ANSI colors, bright variants, 24-bit Hex, and RGB.
-*   **Hyperlinks**: Support for clickable terminal links via the OSC 8 sequence.
-*   **Template Literals**: String interpolation using JavaScript tagged template literals.
+### Node.js (ESM/CJS)
+```javascript
+import inklin from 'inklin';
+console.log(inklin.blue.bold('System Initialized'));
+```
+
+### Browser (CDN)
+```html
+<script src="https://unpkg.com/inklin/cdn/inklin.min.js"></script>
+<script>
+  console.log(inklin.hex('#ff79c6')('Browser Console Support'));
+</script>
+```
+
+## Primary Specifications
+
+*   **Zero Runtime Dependencies**: Self-contained implementation.
+*   **Universal Compatibility**: Support for Node.js (ESM/CJS) and modern Browser consoles.
+*   **Style Restoration**: State-aware mechanism that handles nested `\x1b[0m` resets.
+*   **Automatic Downsampling**: Detects environment capabilities and maps Truecolor to ANSI 256 or 16-color palettes as required.
+*   **JIT-Targeted Engine**: Utilizes monomorphic property access for deterministic performance.
 
 ## Installation
 
@@ -43,38 +56,24 @@ Inklin is a utility for terminal string styling. It provides a chainable API wit
 npm install inklin
 ```
 
-## Usage
+## Extended Usage
 
-### ECMAScript Modules (ESM)
+### Common Use Case: Structured Logging
 ```javascript
-import inklin from 'inklin';
+const log = (level, msg) => {
+  const styles = {
+    info: inklin.blue.bold,
+    warn: inklin.yellow.italic,
+    error: inklin.bgRed.white.bold
+  };
+  console.log(`${styles[level](` ${level.toUpperCase()} `)} ${msg}`);
+};
 
-console.log(inklin.blue('Informational message'));
+log('info', 'Process started.');
+log('error', 'Connection failed.');
 ```
 
-### CommonJS (CJS)
-```javascript
-const inklin = require('inklin');
-
-console.log(inklin.red.bold('Error message'));
-```
-
-### Advanced Formatting
-```javascript
-// Background and modifiers
-console.log(inklin.bgRed.white.bold(' ERROR '));
-
-// Chained modifiers
-console.log(inklin.yellow.italic.underline('Warning: Low disk space'));
-
-// Hexadecimal and RGB
-console.log(inklin.hex('#50fa7b')('Brand Color'));
-console.log(inklin.rgb(255, 165, 0)('Orange Output'));
-```
-
-### Integration
-
-#### Style Nesting
+### Style Nesting
 Inklin manages the ANSI escape stack to ensure nested styles return to the outer context.
 
 ```javascript
@@ -83,44 +82,43 @@ console.log(
 );
 ```
 
-#### Hyperlinks
-Create clickable links in supported terminal emulators.
+### Hyperlinks
+Generates clickable links in supported terminal emulators.
 
 ```javascript
-console.log(inklin.link('Project Repository', 'https://github.com/Sapirrior/inklin'));
+console.log(inklin.link('Repository', 'https://github.com/Sapirrior/inklin'));
 ```
 
-#### Tagged Templates
+### Tagged Templates
 ```javascript
-const module = 'Engine';
-console.log(inklin.cyan.bold`Status: ${module} is operational.`);
+const status = 'Operational';
+console.log(inklin.green.bold`System is ${status}.`);
 ```
 
 ## API Reference
 
-| Category | Available Properties |
+| Category | Properties |
 | :--- | :--- |
-| **Modifiers** | `bold`, `dim`, `italic`, `underline`, `inverse`, `strikethrough` |
-| **Standard Colors** | `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray` |
-| **Bright Colors** | `redBright`, `greenBright`, `yellowBright`, `blueBright`, `magentaBright`, `cyanBright`, `whiteBright` |
+| **Modifiers** | `reset`, `bold`, `dim`, `italic`, `underline`, `inverse`, `strikethrough` |
+| **Colors** | `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray` |
+| **Brights** | `redBright`, `greenBright`, `yellowBright`, `blueBright`, `magentaBright`, `cyanBright`, `whiteBright` |
 | **Backgrounds** | `bgBlack`, `bgRed`, `bgGreen`, `bgYellow`, `bgBlue`, `bgMagenta`, `bgCyan`, `bgWhite`, `bgGray` |
-| **Bright Backgrounds** | `bgRedBright`, `bgGreenBright`, `bgYellowBright`, `bgBlueBright`, `bgMagentaBright`, `bgCyanBright`, `bgWhiteBright` |
 
-### Static Methods
+### Methods
 
-*   **`hex(string)`**: Applies a foreground color using a hexadecimal string.
-*   **`bgHex(string)`**: Applies a background color using a hexadecimal string.
-*   **`rgb(r, g, b)`**: Applies a foreground color using RGB integers (0-255).
-*   **`bgRgb(r, g, b)`**: Applies a background color using RGB integers (0-255).
-*   **`link(text, url)`**: Generates an ANSI escape sequence for a clickable link.
-*   **`enable()` / `disable()`**: Globally toggles styling state.
+*   **`hex(string)` / `bgHex(string)`**: Applies colors via hexadecimal strings (e.g., `#ff0000`).
+*   **`rgb(r, g, b)` / `bgRgb(r, g, b)`**: Applies colors via RGB integers (0-255).
+*   **`link(text, url)`**: Generates an ANSI hyperlink sequence.
+*   **`enable()` / `disable()`**: Toggles global styling state.
 
-## Technical Specifications
+## Technical Architecture
 
-Inklin respects standard environment variables:
-*   Supports `FORCE_COLOR` and `TERM` detection.
-*   Respects `NO_COLOR` and `FORCE_COLOR=0` for explicit disabling of styles.
-*   Footprint is only few KBs.
+Inklin v2.0.0 utilizes a **JIT-Targeted Prototype Architecture** designed for deterministic performance and memory stability.
+
+### Key Implementation Details
+*   **Self-Overwriting Getters**: Style properties replace themselves with static references upon first access, maintaining stable hidden classes (shapes) in the V8 engine.
+*   **Global Regex Registry**: Manages compiled regular expressions through a centralized cache to ensure a finite memory footprint.
+*   **Automatic Capability Detection**: Assesses terminal capabilities and browser environments to determine the appropriate color fidelity level.
 
 ## License
 

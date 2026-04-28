@@ -1,35 +1,36 @@
+"use strict";
+
 const hexCache = new Map();
 
 export function hexToRgb(hex) {
   if (typeof hex !== 'string') return [255, 255, 255];
   
-  const cleanHex = hex.replace('#', '').toLowerCase();
-  if (hexCache.has(cleanHex)) return hexCache.get(cleanHex);
+  const h = hex.startsWith('#') ? hex.slice(1).toLowerCase() : hex.toLowerCase();
+  if (hexCache.has(h)) return hexCache.get(h);
 
-  let h = cleanHex;
   // Validation: Strictly check for valid 3 or 6 digit hex
   if (!/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(h)) return [255, 255, 255];
 
+  let expanded = h;
   if (h.length === 3) {
-    h = h.split('').map(s => s + s).join('');
+    expanded = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
   }
 
-  const n = parseInt(h, 16);
+  const n = parseInt(expanded, 16);
   const rgb = [(n >> 16) & 0xFF, (n >> 8) & 0xFF, n & 0xFF];
   
-  // Cache the result
-  if (hexCache.size < 100) { // Limit cache size to prevent memory leaks
-    hexCache.set(cleanHex, rgb);
+  if (hexCache.size < 256) { // Expanded cache for production workloads
+    hexCache.set(h, rgb);
   }
   
   return rgb;
 }
 
 export function rgbToAnsi256(r, g, b) {
-  // Grayscale ramp
+  // Grayscale ramp optimization
   if (r === g && g === b) {
     if (r < 8) return 16;
-    if (r > 248) return 255;
+    if (r > 248) return 251; // Fix: 255 is near white, but 231 is pure white in 6x6x6
     return Math.round(((r - 8) / 247) * 23) + 232;
   }
 
@@ -40,10 +41,11 @@ export function rgbToAnsi256(r, g, b) {
 }
 
 export function rgbToAnsi16(r, g, b) {
-  const i = r + g + b > 383 ? 8 : 0; // Brightness threshold
-  const red = r > 127 ? 1 : 0;
-  const green = g > 127 ? 2 : 0;
-  const blue = b > 127 ? 4 : 0;
+  // Improved 4-bit mapping
+  const i = (r + g + b) / 3 > 128 ? 8 : 0;
+  const red = r > 128 ? 1 : 0;
+  const green = g > 128 ? 2 : 0;
+  const blue = b > 128 ? 4 : 0;
   return i + red + green + blue;
 }
 
