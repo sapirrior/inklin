@@ -3,6 +3,8 @@ node_modules/
 jspm_packages/
 
 # Build artifacts
+dist/
+cdn/
 .github/
 assets/
 
