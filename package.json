@@ -1,6 +1,6 @@
 {
   "name": "inklin",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Zero-dependency terminal text styling with Truecolor support, state-aware nested restoration, and JIT-targeted execution.",
   "sideEffects": false,
   "main": "./src/inklin.js",
