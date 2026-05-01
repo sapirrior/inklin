@@ -18,7 +18,7 @@
 
 # Inklin
 
-Terminal text styling for command-line interfaces and browser consoles.
+Terminal text styling for command-line interfaces.
 
 Inklin provides a chainable API for string styling with support for state-aware style restoration, Truecolor (RGB/Hex), and CLI hyperlinks, within a zero-dependency footprint.
 
@@ -34,18 +34,10 @@ import inklin from 'inklin';
 console.log(inklin.blue.bold('System Initialized'));
 ```
 
-### Browser (CDN)
-```html
-<script src="https://unpkg.com/inklin/cdn/inklin.min.js"></script>
-<script>
-  console.log(inklin.hex('#ff79c6')('Browser Console Support'));
-</script>
-```
-
 ## Primary Specifications
 
 *   **Zero Runtime Dependencies**: Self-contained implementation.
-*   **Universal Compatibility**: Support for Node.js (ESM/CJS) and modern Browser consoles.
+*   **Module Compatibility**: Support for Node.js (ESM/CJS).
 *   **Style Restoration**: State-aware mechanism that handles nested `\x1b[0m` resets.
 *   **Automatic Downsampling**: Detects environment capabilities and maps Truecolor to ANSI 256 or 16-color palettes as required.
 *   **JIT-Targeted Engine**: Utilizes monomorphic property access for deterministic performance.
@@ -113,12 +105,12 @@ console.log(inklin.green.bold`System is ${status}.`);
 
 ## Technical Architecture
 
-Inklin v2.0.0 utilizes a **JIT-Targeted Prototype Architecture** designed for deterministic performance and memory stability.
+Inklin v3.0.1 utilizes a **JIT-Targeted Prototype Architecture** designed for deterministic performance and memory stability.
 
 ### Key Implementation Details
 *   **Self-Overwriting Getters**: Style properties replace themselves with static references upon first access, maintaining stable hidden classes (shapes) in the V8 engine.
 *   **Global Regex Registry**: Manages compiled regular expressions through a centralized cache to ensure a finite memory footprint.
-*   **Automatic Capability Detection**: Assesses terminal capabilities and browser environments to determine the appropriate color fidelity level.
+*   **Automatic Capability Detection**: Assesses terminal capabilities to determine the appropriate color fidelity level.
 
 ## License
 

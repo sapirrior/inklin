@@ -15,11 +15,9 @@
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "build:cdn": "node scripts/buildCDN.js",
     "test:module": "node tests/esm/suite.js",
     "test:cjs": "node tests/cjs/suite.cjs",
-    "test:cdn": "node tests/cdn/suite.js",
-    "test": "npm run test:module && npm run test:cjs && npm run test:cdn"
+    "test": "npm run test:module && npm run test:cjs"
   },
   "keywords": [
     "terminal",

@@ -15,7 +15,7 @@ export function transformPart(relPath, version) {
 
   return code
     .replace(/^"use strict";?\n?/g, '') // Remove redundant strict mode declaration
-    .replace(/^import\s+.*?;?\n/gm, '') // Remove imports
+    .replace(/^\s*import\s+.*?;?$/gm, '') // Remove imports (anywhere on a line)
     .replace(/\bexport\s+(const|let|function)\b/g, '$1') // Strip named exports
     .replace(/\bexport\s+default\s+.*?;?\n?/g, '') // Strip default exports
     .replace(/__VERSION__/g, version || '0.0.0') // Inject version

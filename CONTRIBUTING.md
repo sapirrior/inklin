@@ -1,66 +1,72 @@
 # Contributing to Inklin
 
-This document outlines the procedures and standards for contributing to the Inklin project. 
+Inklin maintains rigorous engineering and documentation standards to ensure the library remains predictable, performant, and maintainable across all JavaScript environments. All contributors must adhere to these guidelines.
 
-## Technical Constraints
+## Technical Writing Standards
 
-All contributions must adhere to the following project constraints:
-*   **Zero Dependencies**: No external runtime dependencies may be added.
-*   **Module Support**: All code must support both ECMAScript Modules (ESM) and CommonJS (CJS).
-*   **Modular Architecture**: Logic must remain decoupled into `src/kernel/`, `src/registry/`, and `src/processors/`.
-*   **Heavy Nomenclature**: Use standardized terminology for modules: `kernel` (engine), `registry` (constants), `processors` (utilities), and `platform` (environment state).
-*   **Footprint**: Code should remain concise to maintain a small installation size.
+All project communications—including documentation, code comments, commit messages, and pull request descriptions—must utilize **Objective Technical Language**. Precision is prioritized; the use of casual, subjective, or hyperbolic terminology is strictly prohibited.
 
-## Development Setup
+### 1. Style Guidelines
+- **Eliminate Hyperbole:** Avoid terms such as "fast", "blazing", "easy", or "high-performance". Describe the technical mechanism instead (e.g., "monomorphic property access", "O(1) lookup", "minimized memory allocation").
+- **Remove Subjectivity:** Avoid qualifiers like "basically", "actually", "just", or "simple".
+- **Use Literal Terms:** Prefer descriptions of architectural or engine-level reality (e.g., "JIT-optimized", "ANSI-escaped", "hidden-class stable").
 
-The project is developed in an environment with specific filesystem restrictions. Follow these steps for local setup:
+### 2. Documentation Rules
+- **Rationale Over Action:** Comments must clarify *why* an architectural or implementation decision was made. The code itself should clearly express *what* is occurring.
+- **Zero-Dependency Mandate:** Do not propose changes that introduce external runtime dependencies.
 
-1.  Clone the repository.
-2.  Install development dependencies using the `--no-bin-links` flag to ensure compatibility with restricted filesystems:
-    ```bash
-    npm install --no-bin-links
-    ```
+## Engineering Standards
 
-## Build Process
+### 1. Performance & Memory
+- **Monomorphic Execution Paths:** Maintain consistent object shapes (hidden classes) to optimize V8 engine transitions. Avoid patterns that trigger de-optimizations (e.g., `delete` operator, dynamic property injection after initialization).
+- **Self-Overwriting Getters:** When adding style properties to the kernel, follow the pattern of overwriting getters with static references upon first access.
+- **Regex Registry:** Utilize the `REGEX_CACHE` in `src/kernel/kernel.js` for all regular expression operations to prevent memory leaks and unnecessary recompilation.
 
-Inklin uses a custom build script to generate the CommonJS distribution. Do not modify `dist/` files directly.
+### 2. Environment Parity
+- **Universal Compatibility:** Logic must remain stable across Node.js (ESM/CJS) environments.
+- **Zero-Dependency Build:** The build pipeline must remain self-contained within the `scripts/` directory, using regex-based source transformation instead of external bundlers.
 
-To generate the CommonJS bundle:
-```bash
-npm run build
+## Commit Message Protocol
+
+Commit messages serve as a permanent technical record. They must follow a structured format and adhere strictly to the **Technical Writing Standards**.
+
+### Required Format:
+```text
+type(scope): concise summary (imperative mood)
+
+CHANGES:
+- Technical list of modifications.
+
+RATIONALE:
+- Architectural or performance-based reason for the change.
+- Technical comparison of previous vs. new state.
+
+IMPROVEMENTS:
+- Specific gains in performance, reliability, or environment compatibility.
+- Quantifiable metrics where applicable.
 ```
 
-The build script performs keyword transformation and IIFE wrapping to ensure cross-module compatibility.
+### Commit Types:
+- `feat`: A new capability.
+- `fix`: A bug fix.
+- `docs`: Documentation updates.
+- `perf`: Performance optimizations.
+- `refactor`: Structural changes without behavioral updates.
+- `test`: Adding or correcting tests.
+- `chore`: Maintenance tasks.
 
-## Testing
-
-Contributions must include updated or new tests in the `tests/` directory. All tests must pass before a pull request is considered.
-
-Run the test suite:
-```bash
-npm test
-```
+### Mandatory Scopes:
+`kernel`, `platform`, `color`, `registry`, `build`, `types`, `tests`.
 
 ## Pull Request Process
 
-1.  Create a feature branch from `main`.
-2.  Implement changes following the existing code style and modular structure.
-3.  Ensure the build script executes successfully and all tests pass.
-4.  Update the documentation in `README.md` if the public API has changed.
-5.  Submit a pull request with a clear, objective description of the modifications.
-
-## Documentation & Communication Standards
-
-*   **Tone**: Maintain a formal, objective, and technical tone in all documentation, commit messages, and pull requests.
-*   **Prohibitions**: The use of emojis, slang, or casual language is strictly prohibited.
-*   **Clarity**: Descriptions must be concise and to-the-point. Avoid hyperbolic or subjective terms such as "best", "fastest", "high performance", or "revolutionary". Focus strictly on measurable technical facts and implementation details.
-
-## Coding Standards
-
-*   **Formatting**: Use standard JavaScript formatting consistent with the existing codebase.
-*   **Naming**: Use descriptive, camelCase naming for variables and functions.
-*   **Types**: Ensure logic is stable across different input types through proper sanitization.
-*   **Style**: Avoid the use of external libraries; utilize native Node.js or JavaScript primitives only.
+1.  **Branching**: Create a feature branch from `main`.
+2.  **Implementation**: Adhere to the JIT-targeted prototype architecture and strict mode.
+3.  **Verification**:
+    -   Ensure all tests pass: `npm test`.
+    -   Verify the build pipeline: `npm run build`.
+    -   Update `types/inklin.d.ts` if the public API is modified.
+4.  **Submission**: Submit your PR with a detailed technical description following the **Technical Writing Standards**.
 
 ## License
 

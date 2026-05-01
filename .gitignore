@@ -6,6 +6,8 @@ jspm_packages/
 dist/
 .github/
 assets/
+.gemini/
+GEMINI.md
 
 # Logs
 logs

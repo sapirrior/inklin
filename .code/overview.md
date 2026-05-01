@@ -3,11 +3,11 @@
 This document describes the technical architecture and component responsibilities of the Inklin codebase.
 
 ## Version
-Current Major Version: **2.0.0**
+Current Major Version: **3.0.1**
 
 ## Core Architecture
 
-Inklin utilizes a **JIT-Targeted Prototype Architecture** to facilitate style chaining with deterministic performance and memory stability across Node.js and Browser environments.
+Inklin utilizes a **JIT-Targeted Prototype Architecture** to facilitate style chaining with deterministic performance and memory stability across Node.js environments.
 
 ### 1. Entry Point (`src/inklin.js`)
 The primary module for the library. It initializes the base styler instance using the kernel logic and provides the default export.
@@ -23,7 +23,7 @@ The central engine of the library.
 
 #### `platform.js`
 Manages configuration and terminal capability detection.
-- **Capability Detection**: Evaluates environment variables (`COLORTERM`, `FORCE_COLOR`, `TERM`, `NO_COLOR`) or browser global objects to determine the color support level (0-3).
+- **Capability Detection**: Evaluates environment variables (`COLORTERM`, `FORCE_COLOR`, `TERM`, `NO_COLOR`) to determine the color support level (0-3).
 - **Global State**: Exports a shared `env` object, allowing `.disable()` or `.enable()` calls to affect all active styler instances globally.
 
 ### 3. Registry & Definitions (`src/registry/`)
@@ -45,7 +45,6 @@ TypeScript definition file providing interface documentation and autocompletion 
 
 ### 6. Build System (`scripts/`)
 
-#### `build.js` / `buildCDN.js`
-Specialized bundling scripts for the CommonJS distribution (`dist/inklin.cjs`) and minified UMD distribution (`cdn/inklin.min.js`).
+#### `build.js`
+Specialized bundling script for the CommonJS distribution (`dist/inklin.cjs`).
 - **Transformation Logic**: Performs keyword-boundary-sensitive operations to transform ECMAScript Modules into environment-compatible bundles.
-- **Optimization**: The CDN build applies aggressive whitespace and comment removal to minimize network payload.

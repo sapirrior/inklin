@@ -35,7 +35,7 @@ function spawnNext(parent, oCode, cCode) {
   return createStyler(openAnsi, closeAnsi, regex, nextOpenCodes, nextCloseCodes);
 }
 
-// JIT Property Overwriting for Monomorphic Fast-Paths
+// JIT Property Overwriting for Monomorphic Execution Paths
 Object.keys(ANSI_CODES).forEach(prop => {
   Object.defineProperty(stylerProto, prop, {
     configurable: true,

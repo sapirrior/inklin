@@ -1,5 +1,5 @@
 /**
- * Inklin CJS Bundle | v2.0.0
+ * Inklin CJS Bundle | v3.0.1
  * (c) Sapirrior | MIT License
  */
 "use strict";
@@ -186,7 +186,7 @@ const { createStyler } = (function() {
     return createStyler(openAnsi, closeAnsi, regex, nextOpenCodes, nextCloseCodes);
   }
   
-  // JIT Property Overwriting for Monomorphic Fast-Paths
+  // JIT Property Overwriting for Monomorphic Execution Paths
   Object.keys(ANSI_CODES).forEach(prop => {
     Object.defineProperty(stylerProto, prop, {
       configurable: true,
@@ -282,7 +282,7 @@ const { createStyler } = (function() {
     styler._close = closeAnsi;
     styler._oCodes = oCodes;
     styler._cCodes = cCodes;
-    styler.version = '2.0.0';
+    styler.version = '3.0.1';
     
     Object.setPrototypeOf(styler, stylerProto);
     return styler;
